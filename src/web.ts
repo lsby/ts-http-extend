@@ -1,6 +1,6 @@
 import { Log } from '@lsby/ts-log'
-import { randomUUID } from 'crypto'
 import { URL } from 'url'
+import * as uuid from 'uuid'
 import { z } from 'zod'
 
 let log = new Log('@lsby:ts-post-extend')
@@ -16,7 +16,7 @@ export async function 原始的扩展WebPost(
   let url解析 = URL.parse(url)
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
-  let wsId = randomUUID()
+  let wsId = uuid.v1()
   let 扩展头: { [key: string]: string } = {}
   if (ws信息回调 !== void 0) {
     let 设置ws连接 = async (wsId: string): Promise<void> => {
