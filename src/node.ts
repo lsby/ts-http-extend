@@ -17,7 +17,6 @@ export async function 原始的扩展NodePost(
   let url解析 = parseURL(url)
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
-  let wsId = uuid.v1()
   let 扩展头: { [key: string]: string } = {}
   if (ws信息回调 !== void 0) {
     let 设置ws连接 = async (wsId: string): Promise<void> => {
@@ -53,6 +52,8 @@ export async function 原始的扩展NodePost(
         await ws错误回调?.(error)
       }
     }
+
+    let wsId = uuid.v1()
     await 设置ws连接(wsId)
     扩展头 = { 'ws-client-id': wsId }
   }
@@ -81,7 +82,7 @@ export async function 不安全的扩展NodePost<
     url,
     参数,
     头,
-    async (e) => await ws信息回调?.(e.data as any),
+    ws信息回调 === void 0 ? ws信息回调 : async (e): Promise<void> => await ws信息回调(e.data as any),
     ws关闭回调,
     ws错误回调,
   )
@@ -107,11 +108,13 @@ export async function 扩展NodePost<
     url,
     参数,
     头,
-    async (e) => {
-      let 校验 = ws结果描述.safeParse(e.data)
-      if (校验.success === false) throw 校验.error
-      await ws信息回调?.(校验.data)
-    },
+    ws信息回调 === void 0
+      ? ws信息回调
+      : async (e): Promise<void> => {
+          let 校验 = ws结果描述.safeParse(e.data)
+          if (校验.success === false) throw 校验.error
+          await ws信息回调(校验.data)
+        },
     ws关闭回调,
     ws错误回调,
   )
