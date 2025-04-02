@@ -2,14 +2,15 @@ import { Log } from '@lsby/ts-log'
 import { randomUUID } from 'crypto'
 import { URL } from 'url'
 import WebSocket from 'ws'
+import { z } from 'zod'
 
 let log = new Log('@lsby:ts-post-extend')
 
-export async function 不安全的扩展NodePost(
+export async function 原始的扩展NodePost(
   url: string,
   参数: object,
   头: object = {},
-  ws信息回调?: (信息: WebSocket.MessageEvent) => Promise<void>,
+  ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>,
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
 ): Promise<object> {
@@ -61,4 +62,60 @@ export async function 不安全的扩展NodePost(
     headers: { 'Content-Type': 'application/json', ...扩展头, ...头 },
     body: JSON.stringify(参数),
   }).then((a) => a.json())
+}
+
+export async function 不安全的扩展NodePost<
+  url类型 extends string,
+  post参数类型 extends object,
+  post结果类型 extends object,
+  ws结果类型,
+>(
+  url: url类型,
+  参数: post参数类型,
+  头: object = {},
+  ws信息回调?: (数据: ws结果类型) => Promise<void>,
+  ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
+  ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
+): Promise<post结果类型> {
+  let 调用结果 = 原始的扩展NodePost(
+    url,
+    参数,
+    头,
+    async (e) => await ws信息回调?.(e.data as any),
+    ws关闭回调,
+    ws错误回调,
+  )
+  return 调用结果 as any
+}
+
+export async function 扩展NodePost<
+  url类型 extends string,
+  post参数类型 extends object,
+  post结果类型描述 extends z.ZodTypeAny,
+  ws结果类型描述 extends z.ZodTypeAny,
+>(
+  post结果描述: post结果类型描述,
+  ws结果描述: ws结果类型描述,
+  url: url类型,
+  参数: post参数类型,
+  头: object = {},
+  ws信息回调?: (数据: z.infer<ws结果类型描述>) => Promise<void>,
+  ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
+  ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
+): Promise<z.infer<post结果类型描述>> {
+  let 调用结果 = 原始的扩展NodePost(
+    url,
+    参数,
+    头,
+    async (e) => {
+      let 校验 = ws结果描述.safeParse(e.data)
+      if (校验.success === false) throw 校验.error
+      await ws信息回调?.(校验.data)
+    },
+    ws关闭回调,
+    ws错误回调,
+  )
+  let 校验 = post结果描述.safeParse(调用结果)
+  if (校验.success === false) throw 校验.error
+  return 校验.data
 }
