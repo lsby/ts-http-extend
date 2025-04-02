@@ -81,7 +81,7 @@ export async function 不安全的扩展WebPost<
     url,
     参数,
     头,
-    ws信息回调 === void 0 ? ws信息回调 : async (e): Promise<void> => await ws信息回调(e.data as any),
+    ws信息回调 === void 0 ? ws信息回调 : async (e): Promise<void> => await ws信息回调(JSON.parse(e.data as any)),
     ws关闭回调,
     ws错误回调,
   )
