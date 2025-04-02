@@ -111,7 +111,7 @@ export async function 扩展NodePost<
     ws信息回调 === void 0
       ? ws信息回调
       : async (e): Promise<void> => {
-          let 校验 = ws结果描述.safeParse(e.data)
+          let 校验 = ws结果描述.safeParse(JSON.parse(e.data.toString()))
           if (校验.success === false) throw 校验.error
           await ws信息回调(校验.data)
         },
