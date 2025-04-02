@@ -1,6 +1,7 @@
 import { Log } from '@lsby/ts-log'
 import * as uuid from 'uuid'
 import { z } from 'zod'
+import { parseURL } from './tools.js'
 
 let log = new Log('@lsby:ts-post-extend')
 
@@ -12,7 +13,8 @@ export async function 原始的扩展WebPost(
   ws关闭回调?: (事件: CloseEvent) => Promise<void>,
   ws错误回调?: (事件: Event) => Promise<void>,
 ): Promise<object> {
-  let url解析 = new URL(url)
+  let url解析 = parseURL(url)
+  if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
   let wsId = uuid.v1()
   let 扩展头: { [key: string]: string } = {}

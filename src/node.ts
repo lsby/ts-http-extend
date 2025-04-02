@@ -2,6 +2,7 @@ import { Log } from '@lsby/ts-log'
 import * as uuid from 'uuid'
 import WebSocket from 'ws'
 import { z } from 'zod'
+import { parseURL } from './tools.js'
 
 let log = new Log('@lsby:ts-post-extend')
 
@@ -117,23 +118,4 @@ export async function 扩展NodePost<
   let 校验 = post结果描述.safeParse(调用结果)
   if (校验.success === false) throw 校验.error
   return 校验.data
-}
-
-function parseURL(url: string): { protocol: string; host: string; pathname: string } | null {
-  let urlRegex = /^(https?:)\/\/(.*?)(\/.*|$)/
-  let match = url.match(urlRegex)
-
-  if (match === null) return null
-
-  let protocol = match[1]
-  let host = match[2]
-  if (protocol === void 0 || host === void 0) {
-    throw new Error('解析失败')
-  }
-
-  return {
-    protocol: protocol,
-    host: host,
-    pathname: match[3] ?? '/',
-  }
 }
