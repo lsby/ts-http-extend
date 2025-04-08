@@ -13,6 +13,7 @@ export async function 原始的扩展NodePost(
   ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>,
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
+  最大重试次数 = 3,
 ): Promise<object> {
   let url解析 = parseURL(url)
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
@@ -39,13 +40,25 @@ export async function 原始的扩展NodePost(
           await log.info(`WebSocket 连接正常关闭: ${wsId}`)
           return
         }
-        let 退避时间 = 100
-        await log.warn(
-          `WebSocket 连接异常关闭 (code: ${event.code}), 将在 ${退避时间} 毫秒后尝试重连: ${wsId}: %o`,
-          event.reason,
-        )
-        await new Promise<void>((res, _rej) => setTimeout(() => res(), 退避时间))
-        await 设置ws连接(wsId)
+        let 当前尝试次数 = 0
+        while (当前尝试次数 < 最大重试次数) {
+          当前尝试次数++
+          let 退避时间 = 100 * 当前尝试次数
+          await log.warn(
+            `WebSocket 连接异常关闭 (code: ${event.code}), 将在 ${退避时间} 毫秒后第 ${当前尝试次数}/${最大重试次数} 次重连: ${wsId}: %o`,
+            event.reason,
+          )
+          await new Promise<void>((res, _rej) => setTimeout(() => res(), 退避时间))
+          try {
+            await 设置ws连接(wsId)
+            break
+          } catch (error) {
+            if (当前尝试次数 >= 最大重试次数) {
+              await log.error(`WebSocket 重连失败已达最大次数 ${最大重试次数} 次`, error)
+              throw error
+            }
+          }
+        }
       }
       ws连接.onerror = async (error): Promise<void> => {
         await log.error(`WebSocket 发生错误: ${wsId}`, error)
@@ -77,6 +90,7 @@ export async function 不安全的扩展NodePost<
   ws信息回调?: (数据: ws结果类型) => Promise<void>,
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
+  最大重试次数 = 3,
 ): Promise<post结果类型> {
   let 调用结果 = 原始的扩展NodePost(
     url,
@@ -85,6 +99,7 @@ export async function 不安全的扩展NodePost<
     ws信息回调 === void 0 ? ws信息回调 : async (e): Promise<void> => await ws信息回调(JSON.parse(e.data as any)),
     ws关闭回调,
     ws错误回调,
+    最大重试次数,
   )
   return 调用结果 as any
 }
@@ -103,6 +118,7 @@ export async function 扩展NodePost<
   ws信息回调?: (数据: z.infer<ws结果类型描述>) => Promise<void>,
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>,
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
+  最大重试次数 = 3,
 ): Promise<z.infer<post结果类型描述>> {
   let 调用结果 = 原始的扩展NodePost(
     url,
@@ -117,6 +133,7 @@ export async function 扩展NodePost<
         },
     ws关闭回调,
     ws错误回调,
+    最大重试次数,
   )
   let 校验 = post结果描述.safeParse(调用结果)
   if (校验.success === false) throw 校验.error
