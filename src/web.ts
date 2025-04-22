@@ -18,50 +18,67 @@ export async function 原始的扩展WebPost(
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
   let 扩展头: { [key: string]: string } = {}
+  let ws连接状态: Map<string, { 正在连接: boolean }> = new Map()
+
   if (ws信息回调 !== void 0) {
     let 设置ws连接 = async (wsId: string): Promise<void> => {
-      await log.info(`正在建立 WebSocket 连接: ${wsId}`)
-      let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
-
-      await new Promise((res, _rej) => {
-        ws连接.onopen = async (): Promise<void> => {
-          await log.info(`WebSocket 连接已打开: ${wsId}`)
-          res(null)
-        }
-      })
-      ws连接.onmessage = async (event: MessageEvent): Promise<void> => {
-        await log.debug(`收到 WebSocket 消息: ${event.data}`)
-        await ws信息回调(event)
+      if (ws连接状态.get(wsId)?.正在连接 === void 0 || ws连接状态.get(wsId)?.正在连接 === false) {
+        await log.warn(`已有进行中的 WebSocket 连接建立请求: ${wsId}`)
+        return
       }
-      ws连接.onclose = async (event): Promise<void> => {
-        await ws关闭回调?.(event)
-        if (event.code === 1000) {
-          await log.info(`WebSocket 连接正常关闭: ${wsId}`)
-          return
+      ws连接状态.set(wsId, { 正在连接: true })
+
+      try {
+        await log.info(`正在建立 WebSocket 连接: ${wsId}`)
+        let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
+
+        await new Promise((res, _rej) => {
+          ws连接.onopen = async (): Promise<void> => {
+            await log.info(`WebSocket 连接已打开: ${wsId}`)
+            res(null)
+          }
+        })
+
+        ws连接.onmessage = async (event: MessageEvent): Promise<void> => {
+          await log.debug(`收到 WebSocket 消息: ${event.data}`)
+          await ws信息回调(event)
         }
-        let 当前尝试次数 = 0
-        while (当前尝试次数 < 最大重试次数) {
-          当前尝试次数++
-          let 退避时间 = 100 * 当前尝试次数
-          await log.warn(
-            `WebSocket 连接异常关闭 (code: ${event.code}), 将在 ${退避时间} 毫秒后第 ${当前尝试次数}/${最大重试次数} 次重连: ${wsId}: %o`,
-            event.reason,
-          )
-          await new Promise<void>((res, _rej) => setTimeout(() => res(), 退避时间))
-          try {
-            await 设置ws连接(wsId)
-            break
-          } catch (error) {
-            if (当前尝试次数 >= 最大重试次数) {
-              await log.error(`WebSocket 重连失败已达最大次数 ${最大重试次数} 次`, error)
-              throw error
+
+        ws连接.onclose = async (event): Promise<void> => {
+          ws连接状态.set(wsId, { 正在连接: false })
+          await ws关闭回调?.(event)
+          if (event.code === 1000) {
+            await log.info(`WebSocket 连接正常关闭: ${wsId}`)
+            return
+          }
+
+          let 当前尝试次数 = 0
+          while (当前尝试次数 < 最大重试次数) {
+            当前尝试次数++
+            let 退避时间 = 100 * 当前尝试次数
+            await log.warn(
+              `WebSocket 连接异常关闭 (code: ${event.code}), 将在 ${退避时间} 毫秒后第 ${当前尝试次数}/${最大重试次数} 次重连: ${wsId}: %o`,
+              event.reason,
+            )
+            await new Promise<void>((res) => setTimeout(() => res(), 退避时间))
+            try {
+              await 设置ws连接(wsId)
+              break
+            } catch (error) {
+              if (当前尝试次数 >= 最大重试次数) {
+                await log.error(`WebSocket 重连失败已达最大次数 ${最大重试次数} 次`, error)
+                throw error
+              }
             }
           }
         }
-      }
-      ws连接.onerror = async (error): Promise<void> => {
-        await log.error(`WebSocket 发生错误: ${wsId}`, error)
-        await ws错误回调?.(error)
+
+        ws连接.onerror = async (error): Promise<void> => {
+          await log.error(`WebSocket 发生错误: ${wsId}`, error)
+          await ws错误回调?.(error)
+        }
+      } finally {
+        ws连接状态.set(wsId, { 正在连接: false })
       }
     }
 
