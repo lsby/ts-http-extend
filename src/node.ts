@@ -23,7 +23,7 @@ export async function 原始的扩展NodePost(
 
   if (ws信息回调 !== void 0) {
     let 设置ws连接 = async (wsId: string): Promise<void> => {
-      if (ws连接状态.get(wsId)?.正在连接 === void 0 || ws连接状态.get(wsId)?.正在连接 === false) {
+      if (ws连接状态.get(wsId)?.正在连接 === void 0 || ws连接状态.get(wsId)?.正在连接 === true) {
         await log.warn(`已有进行中的 WebSocket 连接建立请求: ${wsId}`)
         return
       }
