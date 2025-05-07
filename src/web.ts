@@ -21,6 +21,7 @@ export async function 原始的扩展WebPost(
   let ws连接状态: Map<string, { 正在连接: boolean }> = new Map()
 
   if (ws信息回调 !== void 0) {
+    let 当前尝试次数 = 0
     let 设置ws连接 = async (wsId: string): Promise<void> => {
       if (ws连接状态.get(wsId)?.正在连接 === true) {
         await log.warn(`已有进行中的 WebSocket 连接建立请求: ${wsId}`)
@@ -52,7 +53,6 @@ export async function 原始的扩展WebPost(
             return
           }
 
-          let 当前尝试次数 = 0
           while (当前尝试次数 < 最大重试次数) {
             当前尝试次数++
             let 退避时间 = 100 * 当前尝试次数
