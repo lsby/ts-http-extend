@@ -140,7 +140,7 @@ export async function 扩展NodePost<
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>,
   最大重试次数 = 3,
 ): Promise<z.infer<post结果类型描述>> {
-  let 调用结果 = 原始的扩展NodePost(
+  let 调用结果 = await 原始的扩展NodePost(
     url,
     参数,
     头,

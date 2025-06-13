@@ -139,7 +139,7 @@ export async function 扩展WebPost<
   ws错误回调?: (事件: Event) => Promise<void>,
   最大重试次数 = 3,
 ): Promise<z.infer<post结果类型描述>> {
-  let 调用结果 = 原始的扩展WebPost(
+  let 调用结果 = await 原始的扩展WebPost(
     url,
     参数,
     头,
