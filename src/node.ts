@@ -88,11 +88,14 @@ export async function 原始的扩展NodePost(
     扩展头 = { 'ws-client-id': wsId }
   }
 
-  return await fetch(url, {
+  let 结果文本 = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...扩展头, ...头 },
     body: JSON.stringify(参数),
-  }).then((a) => a.json())
+  }).then((a) => a.text())
+  await log.debug(`请求结果: %o`, 结果文本)
+
+  return JSON.parse(结果文本)
 }
 
 export async function 不安全的扩展NodePost<
