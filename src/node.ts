@@ -34,12 +34,9 @@ export async function 原始的扩展NodePost(
         await log.info(`正在建立 WebSocket 连接: ${wsId}`)
         let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
 
-        await new Promise((res, _rej) => {
-          ws连接.onopen = async (): Promise<void> => {
-            await log.info(`WebSocket 连接已打开: ${wsId}`)
-            res(null)
-          }
-        })
+        ws连接.onopen = async (): Promise<void> => {
+          await log.info(`WebSocket 连接已打开: ${wsId}`)
+        }
 
         ws连接.onmessage = async (event: WebSocket.MessageEvent): Promise<void> => {
           await log.debug(`收到 WebSocket 消息: ${event.data}`)
