@@ -24,9 +24,18 @@ export async function 原始的扩展NodePost(
     let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
     扩展头 = { 'ws-client-id': wsId }
 
-    ws连接.onopen = async (): Promise<void> => {
-      await log.info(`WebSocket 连接已打开: ${wsId}`)
-    }
+    let ws连接Promise = new Promise<void>((resolve) => {
+      ws连接.onopen = async (): Promise<void> => {
+        await log.info(`WebSocket 连接已打开: ${wsId}`)
+        resolve()
+      }
+
+      ws连接.onerror = async (error): Promise<void> => {
+        await log.warn(`WebSocket 连接失败: ${wsId}`, error)
+        await ws错误回调?.(error)
+        resolve()
+      }
+    })
 
     ws连接.onmessage = async (event: WebSocket.MessageEvent): Promise<void> => {
       await log.debug(`收到 WebSocket 消息: ${event.data}`)
@@ -38,10 +47,7 @@ export async function 原始的扩展NodePost(
       await ws关闭回调?.(event)
     }
 
-    ws连接.onerror = async (error): Promise<void> => {
-      await log.error(`WebSocket 出现错误: ${wsId}`, error)
-      await ws错误回调?.(error)
-    }
+    await ws连接Promise
   }
 
   let 结果文本 = await fetch(url, {
