@@ -154,14 +154,14 @@ export async function 扩展WebPost<
       ? ws信息回调
       : async (e): Promise<void> => {
           let 校验 = ws结果描述.safeParse(JSON.parse(e.data.toString()))
-          if (校验.success === false) throw 校验.error
+          if (校验.success === false) throw e.data.toString()
           await ws信息回调(校验.data)
         },
     ws关闭回调,
     ws错误回调,
   )
   let 校验 = post结果描述.safeParse(调用结果)
-  if (校验.success === false) throw 校验.error
+  if (校验.success === false) throw 调用结果
   return 校验.data
 }
 
@@ -187,13 +187,13 @@ export async function 扩展WebPost表单<
       ? ws信息回调
       : async (e): Promise<void> => {
           let 校验 = ws结果描述.safeParse(JSON.parse(e.data.toString()))
-          if (校验.success === false) throw 校验.error
+          if (校验.success === false) throw e.data.toString()
           await ws信息回调(校验.data)
         },
     ws关闭回调,
     ws错误回调,
   )
   let 校验 = post结果描述.safeParse(调用结果)
-  if (校验.success === false) throw 校验.error
+  if (校验.success === false) throw 调用结果
   return 校验.data
 }
