@@ -57,7 +57,11 @@ async function 内部NodePost处理(
   }).then((a) => a.text())
   await log.debug(`请求结果: %o`, 结果文本)
 
-  return JSON.parse(结果文本)
+  try {
+    return JSON.parse(结果文本)
+  } catch (_e) {
+    throw 结果文本
+  }
 }
 
 export async function 原始的扩展NodePost(
