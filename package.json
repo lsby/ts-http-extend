@@ -1,6 +1,6 @@
 {
   "name": "@lsby/ts-post-extend",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "type": "module",
   "exports": {
     "require": "./dist/cjs/index.cjs",
