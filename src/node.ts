@@ -123,7 +123,9 @@ export async function 不安全的扩展NodePost表单<url类型 extends string,
     url,
     表单数据,
     头,
-    ...(ws信息回调 !== void 0 && { ws信息回调: async (e): Promise<void> => await ws信息回调(JSON.parse(e.data as any)) }),
+    ...(ws信息回调 !== void 0 && {
+      ws信息回调: async (e): Promise<void> => await ws信息回调(JSON.parse(e.data as any)),
+    }),
     ...(ws关闭回调 !== void 0 && { ws关闭回调 }),
     ...(ws错误回调 !== void 0 && { ws错误回调 }),
     ...(ws连接回调 !== void 0 && { ws连接回调 }),
@@ -151,11 +153,13 @@ export async function 扩展NodePost表单<
     url,
     表单数据,
     头,
-    ...(ws信息回调 !== void 0 && { ws信息回调: async (e): Promise<void> => {
+    ...(ws信息回调 !== void 0 && {
+      ws信息回调: async (e): Promise<void> => {
         let 校验 = ws结果描述.safeParse(JSON.parse(e.data.toString()))
         if (校验.success === false) throw e.data.toString()
         await ws信息回调(校验.data)
-      } }),
+      },
+    }),
     ...(ws关闭回调 !== void 0 && { ws关闭回调 }),
     ...(ws错误回调 !== void 0 && { ws错误回调 }),
     ...(ws连接回调 !== void 0 && { ws连接回调 }),
