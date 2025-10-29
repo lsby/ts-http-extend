@@ -9,13 +9,13 @@ async function 内部WebRequest处理(选项: {
   url: string
   body: string | FormData
   headers: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (事件: MessageEvent) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, body, headers, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, body, headers, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let url解析 = parseURL(url)
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
@@ -75,13 +75,13 @@ export async function 原始的扩展WebRequest(选项: {
   url: string
   参数: object
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (事件: MessageEvent) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, 参数, 头 = {}, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 参数, 头 = {}, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   return await 内部WebRequest处理({
     url,
     body: JSON.stringify(参数),
@@ -98,13 +98,13 @@ export async function 原始的扩展WebRequest表单(选项: {
   url: string
   表单数据: FormData
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (事件: MessageEvent) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, 表单数据, 头, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 表单数据, 头, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   return await 内部WebRequest处理({
     url,
     body: 表单数据,
@@ -126,13 +126,13 @@ export async function 不安全的扩展WebRequest<
   url: url类型
   参数: post参数类型
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (数据: ws结果类型) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<post结果类型> {
-  let { url, 参数, 头, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 参数, 头, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let 调用结果 = 原始的扩展WebRequest({
     url,
     参数,
@@ -156,13 +156,13 @@ export async function 不安全的扩展WebRequest表单<
   url: url类型
   表单数据: FormData
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (数据: ws结果类型) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<post结果类型> {
-  let { url, 表单数据, 头 = {}, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 表单数据, 头 = {}, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let 调用结果 = 原始的扩展WebRequest表单({
     url,
     表单数据,
@@ -189,24 +189,13 @@ export async function 扩展WebRequest<
   url: url类型
   参数: post参数类型
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (数据: z.infer<ws结果类型描述>) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<z.infer<post结果类型描述>> {
-  let {
-    post结果描述,
-    ws结果描述,
-    url,
-    参数,
-    头,
-    method = 'POST',
-    ws信息回调,
-    ws关闭回调,
-    ws错误回调,
-    ws连接回调,
-  } = 选项
+  let { post结果描述, ws结果描述, url, 参数, 头, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let 调用结果 = await 原始的扩展WebRequest({
     url,
     参数,
@@ -238,24 +227,13 @@ export async function 扩展WebRequest表单<
   url: url类型
   表单数据: FormData
   头?: { [key: string]: string }
-  method?: 'POST' | 'GET'
+  method: 'POST' | 'GET'
   ws信息回调?: (数据: z.infer<ws结果类型描述>) => Promise<void>
   ws关闭回调?: (事件: CloseEvent) => Promise<void>
   ws错误回调?: (事件: Event) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<z.infer<post结果类型描述>> {
-  let {
-    post结果描述,
-    ws结果描述,
-    url,
-    表单数据,
-    头,
-    method = 'POST',
-    ws信息回调,
-    ws关闭回调,
-    ws错误回调,
-    ws连接回调,
-  } = 选项
+  let { post结果描述, ws结果描述, url, 表单数据, 头, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let 调用结果 = await 原始的扩展WebRequest表单({
     url,
     表单数据,
