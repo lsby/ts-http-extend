@@ -3,9 +3,9 @@ import * as uuid from 'uuid'
 import { z } from 'zod'
 import { parseURL } from './tools.js'
 
-let log = new Log('@lsby:ts-post-extend')
+let log = new Log('@lsby:ts-http-extend')
 
-async function 内部WebPost处理(选项: {
+async function 内部WebRequest处理(选项: {
   url: string
   body: string | FormData
   headers: { [key: string]: string }
@@ -71,7 +71,7 @@ async function 内部WebPost处理(选项: {
   }
 }
 
-export async function 原始的扩展WebPost(选项: {
+export async function 原始的扩展WebRequest(选项: {
   url: string
   参数: object
   头?: { [key: string]: string }
@@ -82,7 +82,7 @@ export async function 原始的扩展WebPost(选项: {
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
   let { url, 参数, 头 = {}, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
-  return await 内部WebPost处理({
+  return await 内部WebRequest处理({
     url,
     body: JSON.stringify(参数),
     headers: { 'Content-Type': 'application/json', ...头 },
@@ -94,7 +94,7 @@ export async function 原始的扩展WebPost(选项: {
   })
 }
 
-export async function 原始的扩展WebPost表单(选项: {
+export async function 原始的扩展WebRequest表单(选项: {
   url: string
   表单数据: FormData
   头?: { [key: string]: string }
@@ -105,7 +105,7 @@ export async function 原始的扩展WebPost表单(选项: {
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
   let { url, 表单数据, 头, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
-  return await 内部WebPost处理({
+  return await 内部WebRequest处理({
     url,
     body: 表单数据,
     headers: 头 ?? {},
@@ -117,7 +117,7 @@ export async function 原始的扩展WebPost表单(选项: {
   })
 }
 
-export async function 不安全的扩展WebPost<
+export async function 不安全的扩展WebRequest<
   url类型 extends string,
   post参数类型 extends object,
   post结果类型 extends object,
@@ -133,7 +133,7 @@ export async function 不安全的扩展WebPost<
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<post结果类型> {
   let { url, 参数, 头, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
-  let 调用结果 = 原始的扩展WebPost({
+  let 调用结果 = 原始的扩展WebRequest({
     url,
     参数,
     ...(头 !== void 0 && { 头 }),
@@ -148,7 +148,11 @@ export async function 不安全的扩展WebPost<
   return 调用结果 as any
 }
 
-export async function 不安全的扩展WebPost表单<url类型 extends string, post结果类型 extends object, ws结果类型>(选项: {
+export async function 不安全的扩展WebRequest表单<
+  url类型 extends string,
+  post结果类型 extends object,
+  ws结果类型,
+>(选项: {
   url: url类型
   表单数据: FormData
   头?: { [key: string]: string }
@@ -159,7 +163,7 @@ export async function 不安全的扩展WebPost表单<url类型 extends string, 
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<post结果类型> {
   let { url, 表单数据, 头 = {}, method = 'POST', ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
-  let 调用结果 = 原始的扩展WebPost表单({
+  let 调用结果 = 原始的扩展WebRequest表单({
     url,
     表单数据,
     头,
@@ -174,7 +178,7 @@ export async function 不安全的扩展WebPost表单<url类型 extends string, 
   return 调用结果 as any
 }
 
-export async function 扩展WebPost<
+export async function 扩展WebRequest<
   url类型 extends string,
   post参数类型 extends object,
   post结果类型描述 extends z.ZodTypeAny,
@@ -203,7 +207,7 @@ export async function 扩展WebPost<
     ws错误回调,
     ws连接回调,
   } = 选项
-  let 调用结果 = await 原始的扩展WebPost({
+  let 调用结果 = await 原始的扩展WebRequest({
     url,
     参数,
     ...(头 !== void 0 && { 头 }),
@@ -224,7 +228,7 @@ export async function 扩展WebPost<
   return 校验.data
 }
 
-export async function 扩展WebPost表单<
+export async function 扩展WebRequest表单<
   url类型 extends string,
   post结果类型描述 extends z.ZodTypeAny,
   ws结果类型描述 extends z.ZodTypeAny,
@@ -252,7 +256,7 @@ export async function 扩展WebPost表单<
     ws错误回调,
     ws连接回调,
   } = 选项
-  let 调用结果 = await 原始的扩展WebPost表单({
+  let 调用结果 = await 原始的扩展WebRequest表单({
     url,
     表单数据,
     ...(头 !== void 0 && { 头 }),
