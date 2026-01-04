@@ -11,12 +11,23 @@ async function 内部NodeRequest处理(选项: {
   body: string | FormData
   headers: { [key: string]: string }
   method: 'POST' | 'GET'
+  wsClientIdHeader?: string
   ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, body, headers, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let {
+    url,
+    body,
+    headers,
+    method,
+    wsClientIdHeader = 'ws-client-id',
+    ws信息回调,
+    ws关闭回调,
+    ws错误回调,
+    ws连接回调,
+  } = 选项
   let url解析 = parseURL(url)
   if (url解析 === null) throw new Error(`无法解析url: ${url}`)
 
@@ -25,7 +36,7 @@ async function 内部NodeRequest处理(选项: {
   if (ws信息回调 !== void 0) {
     let wsId = uuid.v1()
     let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
-    扩展头 = { 'ws-client-id': wsId }
+    扩展头 = { [wsClientIdHeader]: wsId }
 
     let ws连接Promise = new Promise<void>((resolve) => {
       ws连接.onopen = async (): Promise<void> => {
