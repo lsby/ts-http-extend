@@ -1,6 +1,6 @@
 {
   "name": "@lsby/ts-http-extend",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "exports": {
     "require": "./dist/cjs/index.cjs",
