@@ -12,6 +12,8 @@ async function 内部NodeRequest处理(选项: {
   headers: { [key: string]: string }
   method: 'POST' | 'GET'
   wsClientIdHeader?: string
+  wsPath?: string
+  wsIdQueryParam?: string
   ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
@@ -23,6 +25,8 @@ async function 内部NodeRequest处理(选项: {
     headers,
     method,
     wsClientIdHeader = 'ws-client-id',
+    wsPath = '/ws',
+    wsIdQueryParam = 'id',
     ws信息回调,
     ws关闭回调,
     ws错误回调,
@@ -35,7 +39,7 @@ async function 内部NodeRequest处理(选项: {
 
   if (ws信息回调 !== void 0) {
     let wsId = uuid.v1()
-    let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}/ws?id=${wsId}`)
+    let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}${wsPath}?${wsIdQueryParam}=${wsId}`)
     扩展头 = { [wsClientIdHeader]: wsId }
 
     let ws连接Promise = new Promise<void>((resolve) => {
@@ -88,17 +92,21 @@ export async function 原始的扩展NodeRequest(选项: {
   参数: object
   头?: { [key: string]: string }
   method: 'POST' | 'GET'
+  wsPath?: string
+  wsIdQueryParam?: string
   ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, 参数, 头 = {}, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 参数, 头 = {}, method, wsPath, wsIdQueryParam, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   return await 内部NodeRequest处理({
     url,
     body: JSON.stringify(参数),
     headers: { 'Content-Type': 'application/json', ...头 },
     method,
+    ...(wsPath !== void 0 && { wsPath }),
+    ...(wsIdQueryParam !== void 0 && { wsIdQueryParam }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
     ...(ws关闭回调 !== void 0 && { ws关闭回调 }),
     ...(ws错误回调 !== void 0 && { ws错误回调 }),
@@ -111,17 +119,21 @@ export async function 原始的扩展NodeRequest表单(选项: {
   表单数据: FormData
   头?: { [key: string]: string }
   method: 'POST' | 'GET'
+  wsPath?: string
+  wsIdQueryParam?: string
   ws信息回调?: (事件: WebSocket.MessageEvent) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<object> {
-  let { url, 表单数据, 头, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 表单数据, 头, method, wsPath, wsIdQueryParam, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   return await 内部NodeRequest处理({
     url,
     body: 表单数据,
     headers: 头 ?? {},
     method,
+    ...(wsPath !== void 0 && { wsPath }),
+    ...(wsIdQueryParam !== void 0 && { wsIdQueryParam }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
     ...(ws关闭回调 !== void 0 && { ws关闭回调 }),
     ...(ws错误回调 !== void 0 && { ws错误回调 }),
@@ -138,17 +150,21 @@ export async function 不安全的扩展NodeRequest表单<
   表单数据: FormData
   头?: { [key: string]: string }
   method: 'POST' | 'GET'
+  wsPath?: string
+  wsIdQueryParam?: string
   ws信息回调?: (数据: ws结果类型) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
 }): Promise<post结果类型> {
-  let { url, 表单数据, 头 = {}, method, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
+  let { url, 表单数据, 头 = {}, method, wsPath, wsIdQueryParam, ws信息回调, ws关闭回调, ws错误回调, ws连接回调 } = 选项
   let 调用结果 = 原始的扩展NodeRequest表单({
     url,
     表单数据,
     头,
     method,
+    ...(wsPath !== void 0 && { wsPath }),
+    ...(wsIdQueryParam !== void 0 && { wsIdQueryParam }),
     ...(ws信息回调 !== void 0 && {
       ws信息回调: async (e): Promise<void> => await ws信息回调(JSON.parse(e.data as any)),
     }),
@@ -170,6 +186,8 @@ export async function 扩展NodeRequest表单<
   表单数据: FormData
   头?: { [key: string]: string }
   method: 'POST' | 'GET'
+  wsPath?: string
+  wsIdQueryParam?: string
   ws信息回调?: (数据: z.infer<ws结果类型描述>) => Promise<void>
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
@@ -182,6 +200,8 @@ export async function 扩展NodeRequest表单<
     表单数据,
     头 = {},
     method,
+    wsPath,
+    wsIdQueryParam,
     ws信息回调,
     ws关闭回调,
     ws错误回调,
@@ -192,6 +212,8 @@ export async function 扩展NodeRequest表单<
     表单数据,
     头,
     method,
+    ...(wsPath !== void 0 && { wsPath }),
+    ...(wsIdQueryParam !== void 0 && { wsIdQueryParam }),
     ...(ws信息回调 !== void 0 && {
       ws信息回调: async (e): Promise<void> => {
         let 校验 = ws结果描述.safeParse(JSON.parse(e.data.toString()))
