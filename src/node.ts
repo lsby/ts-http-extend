@@ -18,7 +18,7 @@ export async function node请求(选项: {
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
-}): Promise<object> {
+}): Promise<string> {
   let {
     url,
     body,
@@ -78,13 +78,8 @@ export async function node请求(选项: {
   }
 
   let 结果文本 = await fetch(url, fetch选项).then((a) => a.text())
-  await log.debug(`请求结果: %o`, 结果文本)
 
-  try {
-    return JSON.parse(结果文本)
-  } catch (_e) {
-    throw 结果文本
-  }
+  return 结果文本
 }
 
 export async function node请求json(选项: {
@@ -99,7 +94,7 @@ export async function node请求json(选项: {
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
-}): Promise<object> {
+}): Promise<string> {
   let {
     url,
     参数,
@@ -140,7 +135,7 @@ export async function node请求form(选项: {
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
-}): Promise<object> {
+}): Promise<string> {
   let {
     url,
     表单数据,
@@ -181,7 +176,7 @@ export async function node请求query(选项: {
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
-}): Promise<object> {
+}): Promise<string> {
   let {
     url,
     参数,
@@ -225,7 +220,7 @@ export async function node请求urlencoded(选项: {
   ws关闭回调?: (事件: WebSocket.CloseEvent) => Promise<void>
   ws错误回调?: (事件: WebSocket.ErrorEvent) => Promise<void>
   ws连接回调?: (ws: WebSocket) => Promise<void>
-}): Promise<object> {
+}): Promise<string> {
   let {
     url,
     参数,
