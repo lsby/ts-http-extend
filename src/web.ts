@@ -1,16 +1,15 @@
 import { Log } from '@lsby/ts-log'
 import * as uuid from 'uuid'
 import { parseURL } from './tools.js'
+import { 请求方法类型 } from './type.js'
 
 let log = new Log('@lsby:ts-http-extend')
 
-type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS'
-
-async function 内部请求(选项: {
+export async function web请求(选项: {
   url: string
   body: string | FormData
   headers: { [key: string]: string }
-  method: Method
+  method: 请求方法类型
   ws路径?: string
   wsId参数键?: string
   wsId头键?: string
@@ -91,7 +90,7 @@ export async function web请求json(选项: {
   url: string
   参数: object
   头?: { [key: string]: string }
-  method?: Method
+  method?: 请求方法类型
   ws路径?: string
   wsId参数键?: string
   wsId头键?: string
@@ -113,7 +112,7 @@ export async function web请求json(选项: {
     ws错误回调,
     ws连接回调,
   } = 选项
-  return await 内部请求({
+  return await web请求({
     url,
     body: JSON.stringify(参数),
     headers: { 'Content-Type': 'application/json', ...头 },
@@ -131,7 +130,7 @@ export async function web请求form(选项: {
   url: string
   表单数据: FormData
   头?: { [key: string]: string }
-  method?: Method
+  method?: 请求方法类型
   ws路径?: string
   wsId参数键?: string
   wsId头键?: string
@@ -153,7 +152,7 @@ export async function web请求form(选项: {
     ws错误回调,
     ws连接回调,
   } = 选项
-  return await 内部请求({
+  return await web请求({
     url,
     body: 表单数据,
     headers: 头 ?? {},
@@ -172,7 +171,7 @@ export async function web请求query(选项: {
   url: string
   参数: object
   头?: { [key: string]: string }
-  method?: Method
+  method?: 请求方法类型
   ws路径?: string
   wsId参数键?: string
   wsId头键?: string
@@ -197,7 +196,7 @@ export async function web请求query(选项: {
   let 查询字符串 = new URLSearchParams(参数 as Record<string, string>).toString()
   let 分隔符 = url.includes('?') ? '&' : '?'
   let 新url = `${url}${分隔符}${查询字符串}`
-  return await 内部请求({
+  return await web请求({
     url: 新url,
     body: '',
     headers: 头,
@@ -216,7 +215,7 @@ export async function web请求urlencoded(选项: {
   url: string
   参数: object
   头?: { [key: string]: string }
-  method?: Method
+  method?: 请求方法类型
   ws路径?: string
   wsId参数键?: string
   wsId头键?: string
@@ -238,7 +237,7 @@ export async function web请求urlencoded(选项: {
     ws错误回调,
     ws连接回调,
   } = 选项
-  return await 内部请求({
+  return await web请求({
     url,
     body: new URLSearchParams(参数 as Record<string, string>).toString(),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...头 },
