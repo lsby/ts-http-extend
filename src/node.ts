@@ -39,7 +39,8 @@ export async function node请求(选项: {
 
   if (ws信息回调 !== void 0) {
     let wsId = uuid.v1()
-    let ws连接 = new WebSocket(`${url解析.protocol}//${url解析.host}${ws路径}?${wsId参数键}=${wsId}`)
+    let ws协议 = url解析.protocol === 'https:' ? 'wss:' : 'ws:'
+    let ws连接 = new WebSocket(`${ws协议}//${url解析.host}${ws路径}?${wsId参数键}=${wsId}`)
     扩展头 = { [wsId头键]: wsId }
 
     let ws连接Promise = new Promise<void>((resolve) => {
