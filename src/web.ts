@@ -1,6 +1,6 @@
 import { Log } from '@lsby/ts-log'
 import * as uuid from 'uuid'
-import { parseURL } from './tools.js'
+import { parseURL, 构建WebSocket地址 } from './tools.js'
 import { 请求方法类型 } from './type.js'
 
 let log = new Log('@lsby:ts-http-extend')
@@ -11,6 +11,7 @@ export async function web请求(选项: {
   headers: { [key: string]: string }
   method: 请求方法类型
   ws路径?: string
+  ws查询参数?: Record<string, string>
   wsId参数键?: string
   wsId头键?: string
   ws信息回调?: (事件: MessageEvent) => Promise<void>
@@ -24,6 +25,7 @@ export async function web请求(选项: {
     headers,
     method,
     ws路径 = '/ws',
+    ws查询参数,
     wsId参数键 = 'id',
     wsId头键 = 'ws-client-id',
     ws信息回调,
@@ -38,8 +40,17 @@ export async function web请求(选项: {
 
   if (ws信息回调 !== void 0) {
     let wsId = uuid.v1()
-    let ws协议 = url解析.protocol === 'https:' ? 'wss:' : 'ws:'
-    let ws连接 = new WebSocket(`${ws协议}//${url解析.host}${ws路径}?${wsId参数键}=${wsId}`)
+    let ws协议: 'ws:' | 'wss:' = url解析.protocol === 'https:' ? 'wss:' : 'ws:'
+    let ws连接 = new WebSocket(
+      构建WebSocket地址({
+        协议: ws协议,
+        主机: url解析.host,
+        路径: ws路径,
+        id参数键: wsId参数键,
+        id: wsId,
+        ...(ws查询参数 === void 0 ? {} : { 查询参数: ws查询参数 }),
+      }),
+    )
     扩展头 = { [wsId头键]: wsId }
 
     let ws连接Promise = new Promise<void>((resolve) => {
@@ -88,6 +99,7 @@ export async function web请求json(选项: {
   头?: { [key: string]: string }
   method?: 请求方法类型
   ws路径?: string
+  ws查询参数?: Record<string, string>
   wsId参数键?: string
   wsId头键?: string
   ws信息回调?: (事件: MessageEvent) => Promise<void>
@@ -101,6 +113,7 @@ export async function web请求json(选项: {
     头 = {},
     method = 'POST',
     ws路径,
+    ws查询参数,
     wsId参数键,
     wsId头键,
     ws信息回调,
@@ -114,6 +127,7 @@ export async function web请求json(选项: {
     headers: { 'Content-Type': 'application/json', ...头 },
     method,
     ...(ws路径 !== void 0 && { ws路径 }),
+    ...(ws查询参数 !== void 0 && { ws查询参数 }),
     ...(wsId参数键 !== void 0 && { wsId参数键 }),
     ...(wsId头键 !== void 0 && { wsId头键 }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
@@ -128,6 +142,7 @@ export async function web请求form(选项: {
   头?: { [key: string]: string }
   method?: 请求方法类型
   ws路径?: string
+  ws查询参数?: Record<string, string>
   wsId参数键?: string
   wsId头键?: string
   ws信息回调?: (事件: MessageEvent) => Promise<void>
@@ -141,6 +156,7 @@ export async function web请求form(选项: {
     头,
     method = 'POST',
     ws路径,
+    ws查询参数,
     wsId参数键,
     wsId头键,
     ws信息回调,
@@ -154,6 +170,7 @@ export async function web请求form(选项: {
     headers: 头 ?? {},
     method,
     ...(ws路径 !== void 0 && { ws路径 }),
+    ...(ws查询参数 !== void 0 && { ws查询参数 }),
     ...(wsId参数键 !== void 0 && { wsId参数键 }),
     ...(wsId头键 !== void 0 && { wsId头键 }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
@@ -169,6 +186,7 @@ export async function web请求query(选项: {
   头?: { [key: string]: string }
   method?: 请求方法类型
   ws路径?: string
+  ws查询参数?: Record<string, string>
   wsId参数键?: string
   wsId头键?: string
   ws信息回调?: (事件: MessageEvent) => Promise<void>
@@ -182,6 +200,7 @@ export async function web请求query(选项: {
     头 = {},
     method = 'GET',
     ws路径,
+    ws查询参数,
     wsId参数键,
     wsId头键,
     ws信息回调,
@@ -198,6 +217,7 @@ export async function web请求query(选项: {
     headers: 头,
     method,
     ...(ws路径 !== void 0 && { ws路径 }),
+    ...(ws查询参数 !== void 0 && { ws查询参数 }),
     ...(wsId参数键 !== void 0 && { wsId参数键 }),
     ...(wsId头键 !== void 0 && { wsId头键 }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
@@ -213,6 +233,7 @@ export async function web请求urlencoded(选项: {
   头?: { [key: string]: string }
   method?: 请求方法类型
   ws路径?: string
+  ws查询参数?: Record<string, string>
   wsId参数键?: string
   wsId头键?: string
   ws信息回调?: (事件: MessageEvent) => Promise<void>
@@ -226,6 +247,7 @@ export async function web请求urlencoded(选项: {
     头 = {},
     method = 'POST',
     ws路径,
+    ws查询参数,
     wsId参数键,
     wsId头键,
     ws信息回调,
@@ -239,6 +261,7 @@ export async function web请求urlencoded(选项: {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...头 },
     method,
     ...(ws路径 !== void 0 && { ws路径 }),
+    ...(ws查询参数 !== void 0 && { ws查询参数 }),
     ...(wsId参数键 !== void 0 && { wsId参数键 }),
     ...(wsId头键 !== void 0 && { wsId头键 }),
     ...(ws信息回调 !== void 0 && { ws信息回调 }),
